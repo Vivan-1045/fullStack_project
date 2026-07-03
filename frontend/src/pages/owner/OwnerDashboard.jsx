@@ -63,6 +63,9 @@ function OwnerDashboard() {
           Owner Dashboard
         </h1>
 
+        <p className="mb-4 text-gray-600">
+          Total Stores: {stores.length}
+        </p>
 
 
         <div className="overflow-x-auto">

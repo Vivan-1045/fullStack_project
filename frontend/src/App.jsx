@@ -9,6 +9,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserStores from "./pages/user/UserStores";
 import StoresPage from "./pages/admin/StoresPage";
 import UsersPage from "./pages/admin/UsersPage";
+import OwnerDashboard from "./pages/owner/OwnerDashboard";
 
 function App() {
   return (
@@ -61,6 +62,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/owner/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["OWNER"]}>
+              <OwnerDashboard/>
+            </ProtectedRoute>
+          }
+        />
+        
       </Routes>
     </BrowserRouter>
   );

@@ -10,22 +10,17 @@ import UserStores from "./pages/user/UserStores";
 import StoresPage from "./pages/admin/StoresPage";
 import UsersPage from "./pages/admin/UsersPage";
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
+import UpdatePassword from "./pages/UpdatePassword";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-  
-
         <Route path="/" element={<Home />} />
-
-
 
         <Route path="/login" element={<Login />} />
 
         <Route path="/signup" element={<Signup />} />
-
- 
 
         <Route
           path="/admin/dashboard"
@@ -67,11 +62,19 @@ function App() {
           path="/owner/dashboard"
           element={
             <ProtectedRoute allowedRoles={["OWNER"]}>
-              <OwnerDashboard/>
+              <OwnerDashboard />
             </ProtectedRoute>
           }
         />
-        
+
+        <Route
+          path="/update-password"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN", "USER", "OWNER"]}>
+              <UpdatePassword />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

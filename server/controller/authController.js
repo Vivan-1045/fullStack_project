@@ -10,9 +10,40 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    if (name.length < 20 || name.length > 60) {
+      return res.status(400).json({
+        message: "Name must be between 20 and 60 characters",
+      });
+    }
+
+    if (address.length > 400) {
+      return res.status(400).json({
+        message: "Address max length is 400",
+      });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        message: "Invalid email format",
+      });
+    }
+
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[\W_]).{8,16}$/;
+
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must be 8-16 chars with uppercase and special character",
+      });
+    }
+
+    const normalizedEmail = email.toLowerCase();
+
     const checkUser = "SELECT * FROM users WHERE email = ?";
 
-    db.query(checkUser, [email], async (err, result) => {
+    db.query(checkUser, [normalizedEmail], async (err, result) => {
       if (err) {
         return res.status(500).json({ message: "Database error" });
       }
@@ -30,7 +61,7 @@ exports.register = async (req, res) => {
 
       db.query(
         insertQuery,
-        [name, email, hashPass, address, "USER"],
+        [name, normalizedEmail, hashPass, address, "USER"],
         (err, data) => {
           if (err) {
             return res.status(500).json(err);
@@ -68,7 +99,6 @@ exports.login = (req, res) => {
 
       const user = result[0];
 
-
       const isMatch = await bcrypt.compare(password, user.password);
 
       if (!isMatch) {
@@ -76,7 +106,6 @@ exports.login = (req, res) => {
           message: "Invalid email or password",
         });
       }
-
 
       const token = jwt.sign(
         {

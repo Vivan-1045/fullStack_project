@@ -10,6 +10,12 @@ exports.submitRating = (req, res) => {
     rating
   } = req.body;
 
+  if(rating < 1 || rating > 5) {
+    return res.status(400).json({
+      message: "Rating must be between 1 and 5"
+    });
+  }
+
   const query = `
     INSERT INTO ratings
     (user_id, store_id, rating)

@@ -99,7 +99,7 @@ function Login() {
         p-8
         rounded-lg
         shadow-lg
-        w-[400px]
+        w-100
       "
     >
 

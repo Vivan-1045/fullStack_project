@@ -77,7 +77,7 @@ function UpdatePassword() {
             shadow-md
             p-8
             rounded
-            w-[400px]
+            w-100
           "
         >
 

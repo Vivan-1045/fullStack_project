@@ -53,7 +53,7 @@ function Signup() {
         p-8
         rounded-lg
         shadow-lg
-        w-[450px]
+        w-112.5
       "
       >
         <h1

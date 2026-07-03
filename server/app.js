@@ -7,6 +7,7 @@ const adminRoutes = require("./routes/adminRoutes")
 const storeRoutes = require("./routes/storeRoutes")
 const ratingRoutes = require("./routes/ratingRoutes")
 const ownerRoutes = require("./routes/ownerRoutes")
+const userRoutes = require("./routes/userRoutes")
 
 
 const app = express();
@@ -20,6 +21,7 @@ app.use("/api/admin",adminRoutes);
 app.use("/api/stores",storeRoutes);
 app.use("/api/ratings",ratingRoutes);
 app.use("/api/owner",ownerRoutes);
+app.use("/api/users",userRoutes);
 
 
 app.get("/", (req, res) => {

@@ -29,7 +29,7 @@ function Signup() {
 
       alert("Signup successful");
 
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       alert(error.response?.data?.message);
     }
@@ -67,8 +67,6 @@ function Signup() {
           Signup
         </h1>
 
-        {/* NAME */}
-
         <input
           type="text"
           name="name"
@@ -83,7 +81,6 @@ function Signup() {
         "
         />
 
-        {/* EMAIL */}
 
         <input
           type="email"
@@ -99,7 +96,6 @@ function Signup() {
         "
         />
 
-        {/* ADDRESS */}
 
         <textarea
           name="address"
@@ -115,7 +111,6 @@ function Signup() {
         "
         />
 
-        {/* PASSWORD */}
 
         <input
           type="password"
@@ -131,7 +126,6 @@ function Signup() {
         "
         />
 
-        {/* PASSWORD NOTE */}
 
         <p
           className="
@@ -143,8 +137,6 @@ function Signup() {
           Password must contain: 8-16 characters, one uppercase letter, and one
           special character.
         </p>
-
-        {/* BUTTON */}
 
         <button
           type="submit"
@@ -161,7 +153,6 @@ function Signup() {
           Signup
         </button>
 
-        {/* LOGIN LINK */}
 
         <p
           className="

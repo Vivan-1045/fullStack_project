@@ -3,6 +3,8 @@ import { useNavigate, Link }
 from "react-router-dom";
 
 import API from "../services/api";
+import Navbar from "../components/Navbar";
+import UserStores from "../pages/user/UserStores";
 
 function Login() {
 

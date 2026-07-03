@@ -1,19 +1,16 @@
 const db = require("../db/db");
 const bcrypt = require("bcrypt");
 
-
-
 exports.createUser = async (req, res) => {
-
   try {
+    const { name, email, password, address, role } = req.body;
+    const allowedRoles = ["ADMIN", "USER", "OWNER"];
 
-    const {
-      name,
-      email,
-      password,
-      address,
-      role
-    } = req.body;
+    if (!allowedRoles.includes(role)) {
+      return res.status(400).json({
+        message: "Invalid role",
+      });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -27,144 +24,132 @@ exports.createUser = async (req, res) => {
       query,
       [name, email, hashedPassword, address, role],
       (err, result) => {
-
         if (err) {
           return res.status(500).json(err);
         }
 
         res.status(201).json({
-          message: "User created successfully"
+          message: "User created successfully",
         });
-
-      }
+      },
     );
-
   } catch (error) {
-
     res.status(500).json({
-      message: "Server error"
+      message: "Server error",
     });
-
   }
-
 };
-
-
-
 
 exports.createStore = (req, res) => {
-
   try {
+    const { name, email, address, owner_id } = req.body;
 
-    const {
-      name,
-      email,
-      address,
-      owner_id
-    } = req.body;
+    const checkStore = "SELECT * FROM stores WHERE email = ?";
 
-    const query = `
-      INSERT INTO stores
-      (name, email, address, owner_id)
-      VALUES (?, ?, ?, ?)
-    `;
-
-    db.query(
-      query,
-      [name, email, address, owner_id],
-      (err, result) => {
-
-        if (err) {
-          return res.status(500).json(err);
-        }
-
-        res.status(201).json({
-          message: "Store created successfully"
-        });
-
+    db.query(checkStore, [email], (err, result) => {
+      if (err) {
+        return res.status(500).json(err);
       }
-    );
 
-  } catch (error) {
+      if (result.length > 0) {
+        return res.status(400).json({
+          message: "Store with this email already exists",
+        });
+      }
 
-    res.status(500).json({
-      message: "Server error"
-    });
+      const ownerQuery = `
+          SELECT * FROM users
+          WHERE id = ?
+          AND role = 'OWNER'
+        `;
 
-  }
-
-};
-
-
-
-
-exports.getDashboard = (req, res) => {
-
-  try {
-
-    const dashboardData = {};
-
-    db.query(
-      "SELECT COUNT(*) as totalUsers FROM users",
-      (err, usersResult) => {
-
+      db.query(ownerQuery, [owner_id], (err, ownerResult) => {
         if (err) {
           return res.status(500).json(err);
         }
 
-        dashboardData.totalUsers =
-          usersResult[0].totalUsers;
+        if (ownerResult.length === 0) {
+          return res.status(400).json({
+            message: "Invalid owner ID",
+          });
+        }
+
+        const query = `
+              INSERT INTO stores
+              (name, email, address, owner_id)
+              VALUES (?, ?, ?, ?)
+            `;
 
         db.query(
-          "SELECT COUNT(*) as totalStores FROM stores",
-          (err, storesResult) => {
-
+          query,
+          [name, email.toLowerCase(), address, owner_id],
+          (err, result) => {
             if (err) {
               return res.status(500).json(err);
             }
 
-            dashboardData.totalStores =
-              storesResult[0].totalStores;
-
-            db.query(
-              "SELECT COUNT(*) as totalRatings FROM ratings",
-              (err, ratingsResult) => {
-
-                if (err) {
-                  return res.status(500).json(err);
-                }
-
-                dashboardData.totalRatings =
-                  ratingsResult[0].totalRatings;
-
-                res.status(200).json(dashboardData);
-
-              }
-            );
-
-          }
+            res.status(201).json({
+              message: "Store created successfully",
+            });
+          },
         );
-
-      }
-    );
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: "Server error"
+      });
     });
-
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+    });
   }
-
 };
 
+exports.getDashboard = (req, res) => {
+  try {
+    const dashboardData = {};
 
+    db.query("SELECT COUNT(*) as totalUsers FROM users", (err, usersResult) => {
+      if (err) {
+        return res.status(500).json(err);
+      }
 
+      dashboardData.totalUsers = usersResult[0].totalUsers;
 
+      db.query(
+        "SELECT COUNT(*) as totalStores FROM stores",
+        (err, storesResult) => {
+          if (err) {
+            return res.status(500).json(err);
+          }
+
+          dashboardData.totalStores = storesResult[0].totalStores;
+
+          db.query(
+            "SELECT COUNT(*) as totalRatings FROM ratings",
+            (err, ratingsResult) => {
+              if (err) {
+                return res.status(500).json(err);
+              }
+
+              dashboardData.totalRatings = ratingsResult[0].totalRatings;
+
+              res.status(200).json(dashboardData);
+            },
+          );
+        },
+      );
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
 
 exports.getUsers = (req, res) => {
+  const { name, email, role } = req.query;
 
-  const query = `
+  const { sortBy, order } = req.query;
+
+  let query = `
     SELECT
       id,
       name,
@@ -172,44 +157,79 @@ exports.getUsers = (req, res) => {
       address,
       role
     FROM users
+    WHERE 1=1
   `;
 
-  db.query(query, (err, result) => {
+  const values = [];
 
+  if (name) {
+    query += " AND name LIKE ?";
+    values.push(`%${name}%`);
+  }
+
+  if (email) {
+    query += " AND email LIKE ?";
+    values.push(`%${email}%`);
+  }
+
+  if (role) {
+    query += " AND role = ?";
+    values.push(role);
+  }
+
+  const allowedSortFields = ["name", "email", "role"];
+
+  if (sortBy && allowedSortFields.includes(sortBy)) {
+    query += `
+    ORDER BY ${sortBy}
+    ${order === "desc" ? "DESC" : "ASC"}
+  `;
+  }
+
+  db.query(query, values, (err, result) => {
     if (err) {
       return res.status(500).json(err);
     }
 
     res.status(200).json(result);
-
   });
-
 };
 
-
-
-
-
 exports.getStores = (req, res) => {
+  const { name, address } = req.query;
 
-  const query = `
+  let query = `
     SELECT
       stores.*,
       AVG(ratings.rating) as average_rating
+
     FROM stores
+
     LEFT JOIN ratings
     ON stores.id = ratings.store_id
-    GROUP BY stores.id
+
+    WHERE 1=1
   `;
 
-  db.query(query, (err, result) => {
+  const values = [];
 
+  if (name) {
+    query += " AND stores.name LIKE ?";
+    values.push(`%${name}%`);
+  }
+
+  if (address) {
+    query += " AND stores.address LIKE ?";
+    values.push(`%${address}%`);
+  }
+
+  query += " GROUP BY stores.id";
+
+  db.query(query, values, (err, result) => {
     if (err) {
       return res.status(500).json(err);
     }
 
     res.status(200).json(result);
-
   });
-
 };

@@ -8,25 +8,20 @@ exports.getOwnerDashboard = (req, res) => {
 
   const query = `
     SELECT
-      stores.name as store_name,
-      users.name as user_name,
-      ratings.rating,
+      stores.id,
+      stores.name,
+      stores.address,
 
-      (
-        SELECT AVG(rating)
-        FROM ratings
-        WHERE ratings.store_id = stores.id
-      ) as average_rating
+      AVG(ratings.rating) as average_rating
 
     FROM stores
 
     LEFT JOIN ratings
     ON stores.id = ratings.store_id
 
-    LEFT JOIN users
-    ON ratings.user_id = users.id
-
     WHERE stores.owner_id = ?
+
+    GROUP BY stores.id
   `;
 
   db.query(query, [ownerId], (err, result) => {

@@ -1,10 +1,10 @@
 import { useEffect, useState }
-from "react";
+  from "react";
 
 import API from "../../services/api";
 
 import Navbar
-from "../../components/Navbar";
+  from "../../components/Navbar";
 
 
 
@@ -65,68 +65,78 @@ function OwnerDashboard() {
 
 
 
-        <table
-          className="
-            w-full
-            bg-white
-            shadow-md
-          "
-        >
+        <div className="overflow-x-auto">
 
-          <thead>
+          <table
+            className="
+      w-full
+      bg-white
+      shadow-md
+      rounded-lg
+      overflow-hidden
+    "
+          >
 
-            <tr className="bg-gray-200">
+            <thead>
 
-              <th className="p-4">
-                Store Name
-              </th>
+              <tr className="bg-gray-200 text-gray-700">
 
-              <th className="p-4">
-                Address
-              </th>
+                <th className="p-4 text-left">
+                  Store Name
+                </th>
 
-              <th className="p-4">
-                Average Rating
-              </th>
+                <th className="p-4 text-left">
+                  Address
+                </th>
 
-            </tr>
-
-          </thead>
-
-
-
-          <tbody>
-
-            {stores.map((store) => (
-
-              <tr
-                key={store.id}
-                className="border-b"
-              >
-
-                <td className="p-4">
-                  {store.name}
-                </td>
-
-                <td className="p-4">
-                  {store.address}
-                </td>
-
-                <td className="p-4">
-                  {
-                    Number(
-                      store.average_rating
-                    ).toFixed(1)
-                  }
-                </td>
+                <th className="p-4 text-center">
+                  Average Rating
+                </th>
 
               </tr>
 
-            ))}
+            </thead>
 
-          </tbody>
 
-        </table>
+
+            <tbody>
+
+              {stores.map((store) => (
+
+                <tr
+                  key={store.id}
+                  className="
+            border-b
+            hover:bg-gray-50
+            transition
+          "
+                >
+
+                  <td className="p-4">
+                    {store.name}
+                  </td>
+
+                  <td className="p-4">
+                    {store.address}
+                  </td>
+
+                  <td className="p-4 text-center">
+                    {
+                      Number(
+                        store.average_rating
+                      ).toFixed(1)
+                    }
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
 
       </div>
 

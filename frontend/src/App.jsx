@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
-import ProtectedRoute from "./routes/ProtectedRoute";
+import ProtectedRoute from "./routes/protectedRoute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
 import UserStores from "./pages/user/UserStores";
